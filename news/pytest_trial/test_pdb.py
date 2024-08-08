@@ -1,5 +1,8 @@
 # test_pdb.py
 import pdb
+import pytest  # Для использования маркеров нужно импортировать модуль pytest.
+
+pytestmark = pytest.mark.skip # Все тесты в этом файле будут пропущены.
 
 def integers_counter(data):
     # Создаем счётчик для целых чисел.
@@ -21,3 +24,11 @@ def test_counter():
     integers = integers_counter(data)
     # Целых чисел должно быть 2.
     assert integers == 2
+
+
+# @pytest.mark.skip  # Тест с этим маркером будет пропущен.
+def test_will_be_skipped():
+    assert True
+
+def test_will_be_launched():
+    assert False 
