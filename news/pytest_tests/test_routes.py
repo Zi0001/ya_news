@@ -10,6 +10,7 @@ import pytest
 #     response = client.get(url)
 #     assert response.status_code == HTTPStatus.OK
 
+
 @pytest.mark.parametrize(
     'name, args',
     (
@@ -19,7 +20,6 @@ import pytest
         ('users:logout', None)
     )
 )
-
 @pytest.mark.django_db
 def test_detail(client, name, args):
     url = reverse(name, args=args)
@@ -37,6 +37,7 @@ def test_delete_edit_auth_user(author_client, name, news):
     response = author_client.get(url)
     assert response.status_code == HTTPStatus.OK
 
+
 @pytest.mark.parametrize(
     'name',
     ('news:delete', 'news:edit')
@@ -48,6 +49,7 @@ def testredirects_login(client, name, news):
     expected_url = f'{login_url}?next={url}'
     response = client.get(url)
     assertRedirects(response, expected_url)
+
 
 @pytest.mark.parametrize(
     'parametrized_client, expected_status',
@@ -65,4 +67,4 @@ def test_pages_availability_for_different_users(
 ):
     url = reverse(name, args=(news.pk,))
     response = parametrized_client.get(url)
-    assert response.status_code == expected_status 
+    assert response.status_code == expected_status

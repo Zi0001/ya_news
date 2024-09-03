@@ -1,6 +1,8 @@
+from http import HTTPStatus
 from django.urls import reverse
 import pytest
 from news.forms import CommentForm
+from pytest_django.asserts import assertRedirects, assertFormError
 
 from news.forms import BAD_WORDS, WARNING
 
@@ -42,3 +44,18 @@ def test_anonimous_edit_comment(client, new):
     client.post(url, data=form_data)
     new.refresh_from_db()
     assert Comment.objects.count() == 0
+
+
+def test_author_can_delete_news(author_client, slug_for_args, news):
+    url = reverse('news:delete', args=(news.pk,))
+    response = author_client.post(url)
+    expected_url = reverse('news:detail', args=slug_for_args) + "#comments"
+    assertRedirects(response, expected_url)
+    assert News.objects.count() == 0
+
+@pytest.mark.django_db
+def test_anonimous_user_delete_news(client, slug_for_args):
+    url = reverse('news:delete', args=slug_for_args)
+    response = client.post(url)
+    assert response.status_code == HTTPStatus.FOUND
+    assert News.objects.count() == 1
