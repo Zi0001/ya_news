@@ -4,18 +4,12 @@ from pytest_django.asserts import assertRedirects
 from django.urls import reverse
 import pytest
 
-# @pytest.mark.django_db
-# def test_home_anonymous_user(client):
-#     url = reverse('news:home')
-#     response = client.get(url)
-#     assert response.status_code == HTTPStatus.OK
-
 
 @pytest.mark.parametrize(
     'name, args',
     (
         ('news:home', None),
-        ('news:detail', pytest.lazy_fixture('slug_for_args')),
+        ('news:detail', pytest.lazy_fixture('pk_for_args')),
         ('users:login', None),
         ('users:logout', None)
     )

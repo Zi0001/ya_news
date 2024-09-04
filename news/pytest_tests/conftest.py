@@ -1,45 +1,40 @@
-# conftest.py
 from django.conf import settings
 import pytest
 
-# Импортируем класс клиента.
 from django.test.client import Client
 
-# Импортируем модель заметки, чтобы создать экземпляр.
 from news.models import Comment, News
 from datetime import datetime, timedelta
 from django.utils import timezone
 
 
 @pytest.fixture
-# Используем встроенную фикстуру для модели пользователей django_user_model.
-def author(django_user_model):  
+def author(django_user_model):
     return django_user_model.objects.create(username='Автор')
 
 
 @pytest.fixture
-def not_author(django_user_model):  
+def not_author(django_user_model):
     return django_user_model.objects.create(username='Не автор')
 
 
 @pytest.fixture
-def author_client(author):  # Вызываем фикстуру автора.
-    # Создаём новый экземпляр клиента, чтобы не менять глобальный.
+def author_client(author):
     client = Client()
-    client.force_login(author)  # Логиним автора в клиенте.
+    client.force_login(author)
     return client
 
 
 @pytest.fixture
 def not_author_client(not_author):
     client = Client()
-    client.force_login(not_author)  # Логиним обычного пользователя в клиенте.
+    client.force_login(not_author)
     return client
 
 
 @pytest.fixture
 def news(author):
-    news = News.objects.create(  # Создаём объект заметки.
+    news = News.objects.create(
         title='Заголовок',
         text='Текст заметки',
     )
@@ -52,10 +47,7 @@ def news(author):
 
 
 @pytest.fixture
-# Фикстура запрашивает другую фикстуру создания заметки.
-def slug_for_args(news):
-    # И возвращает кортеж, который содержит slug заметки.
-    # На то, что это кортеж, указывает запятая в конце выражения.
+def pk_for_args(news):
     return (news.pk,)
 
 
@@ -88,7 +80,6 @@ def comments_detail_news(news, author):
         comment.save()
 
 
-
 @pytest.fixture
 def new(author):
     news = News.objects.create(
@@ -97,14 +88,7 @@ def new(author):
     )
     return news
 
+
 @pytest.fixture
 def comment(author):
-    # comment = Comment.objects.create(
-    #     news=news,
-    #     author=author,
-    #     text='Текст',
-    # )
-    # return comment
-    return{
-        'text':'Test',
-    }
+    return {'text': 'Test'}

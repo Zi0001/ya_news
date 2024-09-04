@@ -1,12 +1,11 @@
 from http import HTTPStatus
 from django.urls import reverse
 import pytest
-from news.forms import CommentForm
-from pytest_django.asserts import assertRedirects, assertFormError
+from pytest_django.asserts import assertRedirects
 
-from news.forms import BAD_WORDS, WARNING
+from news.forms import BAD_WORDS
 
-from news.models import Comment, News
+from news.models import Comment
 
 
 def test_anonimous_comment(client, new, comment):
@@ -31,7 +30,7 @@ def test_user_cant_use_bad_words(author_client, new):
 
 def test_auth_edit_comment(author_client, news):
     url = reverse('news:edit', args=(news.pk,))
-    form_data = {'text':'Test'}
+    form_data = {'text': 'Test'}
     author_client.post(url, data=form_data)
     news.refresh_from_db()
     coun = Comment.objects.count()
@@ -40,22 +39,23 @@ def test_auth_edit_comment(author_client, news):
 
 def test_anonimous_edit_comment(client, new):
     url = reverse('news:edit', args=(new.pk,))
-    form_data = {'text':'Test'}
+    form_data = {'text': 'Test'}
     client.post(url, data=form_data)
     new.refresh_from_db()
     assert Comment.objects.count() == 0
 
 
-def test_author_can_delete_news(author_client, slug_for_args, news):
-    url = reverse('news:delete', args=(news.pk,))
+def test_author_can_delete_news(author_client, pk_for_args):
+    url = reverse('news:delete', args=pk_for_args)
     response = author_client.post(url)
-    expected_url = reverse('news:detail', args=slug_for_args) + "#comments"
-    assertRedirects(response, expected_url)
-    assert News.objects.count() == 0
+    expected_url = reverse('news:detail', args=pk_for_args)
+    assertRedirects(response, f'{expected_url}#comments')
+    assert Comment.objects.count() == 0
+
 
 @pytest.mark.django_db
-def test_anonimous_user_delete_news(client, slug_for_args):
-    url = reverse('news:delete', args=slug_for_args)
+def test_anonimous_user_delete_news(client, pk_for_args):
+    url = reverse('news:delete', args=pk_for_args)
     response = client.post(url)
     assert response.status_code == HTTPStatus.FOUND
-    assert News.objects.count() == 1
+    assert Comment.objects.count() == 1

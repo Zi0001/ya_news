@@ -32,10 +32,10 @@ class TestRoutes(TestCase):
         # имя пути и позиционные аргументы для функции reverse().
         urls = (
             # Путь для главной страницы не принимает
-            # никаких позиционных аргументов, 
+            # никаких позиционных аргументов,
             # поэтому вторым параметром ставим None.
             ('news:home', None),
-            # Путь для страницы новости 
+            # Путь для страницы новости
             # принимает в качестве позиционного аргумента
             # id записи; передаём его в кортеже.
             ('news:detail', (self.news.id,)),
@@ -43,8 +43,8 @@ class TestRoutes(TestCase):
             ('users:logout', None),
             ('users:signup', None),
         )
-        
-        # Итерируемся по внешнему кортежу 
+
+        # Итерируемся по внешнему кортежу
         # и распаковываем содержимое вложенных кортежей:
         for name, args in urls:
             with self.subTest(name=name):
@@ -56,8 +56,8 @@ class TestRoutes(TestCase):
 
     def test_availability_for_comment_edit_and_delete(self):
         users_statuses = (
-            (self.author, HTTPStatus.OK), # автор комментария должен получить ответ OK,
-            (self.reader, HTTPStatus.NOT_FOUND), # читатель должен получить ответ NOT_FOUND.
+            (self.author, HTTPStatus.OK),
+            (self.reader, HTTPStatus.NOT_FOUND),
         )
         for user, status in users_statuses:
             # Логиним пользователя в клиенте:
@@ -76,11 +76,13 @@ class TestRoutes(TestCase):
         # В цикле перебираем имена страниц, с которых ожидаем редирект:
         for name in ('news:edit', 'news:delete'):
             with self.subTest(name=name):
-                # Получаем адрес страницы редактирования или удаления комментария:
+                # Получаем адрес страницы редактирования
+                # или удаления комментария:
                 url = reverse(name, args=(self.comment.id,))
-                # Получаем ожидаемый адрес страницы логина, 
+                # Получаем ожидаемый адрес страницы логина,
                 # на который будет перенаправлен пользователь.
-                # Учитываем, что в адресе будет параметр next, в котором передаётся
+                # Учитываем, что в адресе будет параметр next,
+                # в котором передаётся
                 # адрес страницы, с которой пользователь был переадресован.
                 redirect_url = f'{login_url}?next={url}'
                 response = self.client.get(url)
