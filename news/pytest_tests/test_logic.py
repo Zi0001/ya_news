@@ -8,15 +8,18 @@ from news.forms import BAD_WORDS
 from news.models import Comment
 
 
-def test_anonimous_comment(client, new, comment):
+FORM_DATA = {'text': 'Test'}
+
+
+def test_anonimous_comment(client, new):
     url = reverse('news:detail', args=(new.pk,))
-    client.post(url, comment)
+    client.post(url, FORM_DATA)
     assert Comment.objects.count() == 0
 
 
-def test_auth_user_comment(author_client, new, comment):
+def test_auth_user_comment(author_client, new):
     url = reverse('news:detail', args=(new.pk,))
-    author_client.post(url, comment)
+    author_client.post(url, FORM_DATA)
     assert Comment.objects.count() == 1
 
 
@@ -28,10 +31,9 @@ def test_user_cant_use_bad_words(author_client, new):
     assert comments_count == 0
 
 
-def test_auth_edit_comment(author_client, news):
+def test_auth_edit_comment(author_client, news, comment):
     url = reverse('news:edit', args=(news.pk,))
-    form_data = {'text': 'Test'}
-    author_client.post(url, data=form_data)
+    author_client.post(url, data=FORM_DATA)
     news.refresh_from_db()
     coun = Comment.objects.count()
     assert coun == 1
@@ -39,23 +41,22 @@ def test_auth_edit_comment(author_client, news):
 
 def test_anonimous_edit_comment(client, new):
     url = reverse('news:edit', args=(new.pk,))
-    form_data = {'text': 'Test'}
-    client.post(url, data=form_data)
+    client.post(url, data=FORM_DATA)
     new.refresh_from_db()
     assert Comment.objects.count() == 0
 
 
-def test_author_can_delete_news(author_client, pk_for_args):
-    url = reverse('news:delete', args=pk_for_args)
+def test_author_can_delete_news(author_client, news, comment):
+    url = reverse('news:delete', args=(news.pk,))
     response = author_client.post(url)
-    expected_url = reverse('news:detail', args=pk_for_args)
+    expected_url = reverse('news:detail', args=(news.pk,))
     assertRedirects(response, f'{expected_url}#comments')
     assert Comment.objects.count() == 0
 
 
 @pytest.mark.django_db
-def test_anonimous_user_delete_news(client, pk_for_args):
-    url = reverse('news:delete', args=pk_for_args)
+def test_anonimous_user_delete_news(client, news, comment):
+    url = reverse('news:delete', args=(news.pk,))
     response = client.post(url)
     assert response.status_code == HTTPStatus.FOUND
     assert Comment.objects.count() == 1

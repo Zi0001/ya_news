@@ -4,7 +4,7 @@ import pytest
 from django.test.client import Client
 
 from news.models import Comment, News
-from datetime import datetime, timedelta
+from datetime import timedelta
 from django.utils import timezone
 
 
@@ -37,13 +37,24 @@ def news(author):
     news = News.objects.create(
         title='Заголовок',
         text='Текст заметки',
+
     )
-    Comment.objects.create(
+
+    # Comment.objects.create(
+    #     news=news,
+    #     text='Текст комментария',
+    #     author=author
+    # )
+    return news
+
+
+@pytest.fixture
+def comment(author, news):
+    return Comment.objects.create(
         news=news,
         text='Текст комментария',
         author=author
     )
-    return news
 
 
 @pytest.fixture
@@ -53,7 +64,7 @@ def pk_for_args(news):
 
 @pytest.fixture
 def page_home_count_news():
-    today = datetime.today()
+    today = timezone.now()
     all_news = [
         News(
             title=f'Новость {index}',
@@ -82,13 +93,7 @@ def comments_detail_news(news, author):
 
 @pytest.fixture
 def new(author):
-    news = News.objects.create(
+    return News.objects.create(
         title='Заголовок',
         text='Текст заметки',
     )
-    return news
-
-
-@pytest.fixture
-def comment(author):
-    return {'text': 'Test'}

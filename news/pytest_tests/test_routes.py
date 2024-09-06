@@ -26,7 +26,7 @@ def test_detail(client, name, args):
     ('news:delete', 'news:edit')
 )
 @pytest.mark.django_db
-def test_delete_edit_auth_user(author_client, name, news):
+def test_delete_edit_auth_user(author_client, name, news, comment):
     url = reverse(name, args=(news.pk,))
     response = author_client.get(url)
     assert response.status_code == HTTPStatus.OK
@@ -57,7 +57,7 @@ def testredirects_login(client, name, news):
     ('news:delete', 'news:edit'),
 )
 def test_pages_availability_for_different_users(
-        parametrized_client, name, news, expected_status
+        parametrized_client, name, news, expected_status, comment
 ):
     url = reverse(name, args=(news.pk,))
     response = parametrized_client.get(url)
