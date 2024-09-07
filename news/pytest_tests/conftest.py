@@ -39,12 +39,6 @@ def news(author):
         text='Текст заметки',
 
     )
-
-    # Comment.objects.create(
-    #     news=news,
-    #     text='Текст комментария',
-    #     author=author
-    # )
     return news
 
 
@@ -57,6 +51,8 @@ def comment(author, news):
     )
 
 
+# Не смог полностью убрать.
+# В одном месте test_routes
 @pytest.fixture
 def pk_for_args(news):
     return (news.pk,)
